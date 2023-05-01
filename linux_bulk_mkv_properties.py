@@ -44,7 +44,6 @@ ids_audio = []  # Holds the unique audio IDs
 languages_subtitle = []  # Holds the unique subtitle languages
 types_subtitle = []  # Holds the unique subtitle types (codex)
 ids_subtitle = []  # Holds the unique subtitle ids
-ids_defaults = []  # Holds which tracks have Default set to True
 command_lines = {}  # The full list of command lines, or the output of this application
 output = ""  # The output of the command lines
 multi_lines = False
@@ -512,7 +511,7 @@ class Main():
         about = gtk.AboutDialog()
         about.connect("key-press-event", self.about_dialog_key_press)  # Easter Egg:  Check to see if Konami code has been entered
         about.set_program_name("Linux Bulk MKV Properties")
-        about.set_version("Version 1.1")
+        about.set_version("Version 1.2")
         about.set_copyright("Copyright (c) BSFEMA")
         about.set_comments("Python application using Gtk and Glade for bulk editing MKV default properties in Linux")
         about.set_license_type(gtk.License(7))  # License = MIT_X11
@@ -667,9 +666,9 @@ def populate_files_Full():
         part10 = {}
         part11 = []
         part12 = []
-        files_Full.append([part0, part1, part2, part3, part4, part5, part6, part7, part8, part9, part10])
-        # Get the track information
-        parse_json_data()
+        files_Full.append([part0, part1, part2, part3, part4, part5, part6, part7, part8, part9, part10, part11])
+    # Get the track information
+    parse_json_data()
 
 
 def parse_json_data():
@@ -680,7 +679,6 @@ def parse_json_data():
     global types_subtitle
     global ids_audio
     global ids_subtitle
-    global ids_defaults
     global multi_lines
     # Clear the lists
     languages_audio.clear()
@@ -689,7 +687,6 @@ def parse_json_data():
     types_subtitle.clear()
     ids_audio.clear()
     ids_subtitle.clear()
-    ids_defaults.clear()
     # Parse the json data to get the individual tracks for the various types
     for i in range(len(files_Full)):
         if "title" in files_Full[i][7]["container"]["properties"]:
@@ -701,12 +698,12 @@ def parse_json_data():
                 track_type = track["codec"]
                 track_id = track["id"]
                 if track["properties"].get("default_track") == True:
-                    if track["type"] != "video":
-                        ids_defaults.append(str(track_id))
-                        if files_Full[i][4] == "":
-                            files_Full[i][4] = files_Full[i][4] + "<b>" + str(track_id) + "</b>-" + track["type"]
+                    if str(track["type"]).upper() != "video".upper():
+                        files_Full[i][11].append(str(track_id))
+                        if len(files_Full[i][4]) == 0:
+                            files_Full[i][4] = "<b>" + str(track_id) + "</b>-" + str(track["type"])
                         else:
-                            files_Full[i][4] = files_Full[i][4] + "\n<b>" + str(track_id) + "</b>-" + track["type"]
+                            files_Full[i][4] = files_Full[i][4] + "\n<b>" + str(track_id) + "</b>-" + str(track["type"])
                 if track["type"] == "audio":  # Populate the track IDs for the audio tracks
                     if str(track_id) not in ids_audio:
                         ids_audio.append(str(track_id))
@@ -763,30 +760,30 @@ def parse_json_data():
     if multi_lines == True:
         multi_lines_string = "\n"
     else:
-        multi_lines_string =",  "
+        multi_lines_string = ",  "
     for i in range(len(files_Full)):
         audio = ""
         for track in files_Full[i][9]:
             name = str(files_Full[i][9][track]["track_name"])
             if name == "":
                 if len(audio) > 0:
-                    if str(track) in ids_defaults:
-                        audio = audio + "<b>" + str(multi_lines_string) + str(track) + "-" + str(files_Full[i][9][track]["track_lang"]) + " (" + str(files_Full[i][9][track]["track_type"]) + ")</b>"
+                    if str(track) in files_Full[i][11]:
+                        audio = audio + str(multi_lines_string) + "<b>" + str(track) + "-" + str(files_Full[i][9][track]["track_lang"]) + " (" + str(files_Full[i][9][track]["track_type"]) + ")</b>"
                     else:
                         audio = audio + str(multi_lines_string) + str(track) + "-" + str(files_Full[i][9][track]["track_lang"]) + " (" + str(files_Full[i][9][track]["track_type"]) + ")"
                 else:
-                    if str(track) in ids_defaults:
+                    if str(track) in files_Full[i][11]:
                         audio = audio + "<b>" + str(track) + "-" + str(files_Full[i][9][track]["track_lang"]) + " (" + str(files_Full[i][9][track]["track_type"]) + ")</b>"
                     else:
                         audio = audio + str(track) + "-" + str(files_Full[i][9][track]["track_lang"]) + " (" + str(files_Full[i][9][track]["track_type"]) + ")"
             else:
                 if len(audio) > 0:
-                    if str(track) in ids_defaults:
-                        audio = audio + "<b>" + str(multi_lines_string) + str(track) + "-" + str(files_Full[i][9][track]["track_lang"]) + " ('" + str(name) + "' " + str(files_Full[i][9][track]["track_type"]) + ")</b>"
+                    if str(track) in files_Full[i][11]:
+                        audio = audio + str(multi_lines_string) + "<b>" + str(track) + "-" + str(files_Full[i][9][track]["track_lang"]) + " ('" + str(name) + "' " + str(files_Full[i][9][track]["track_type"]) + ")</b>"
                     else:
                         audio = audio + str(multi_lines_string) + str(track) + "-" + str(files_Full[i][9][track]["track_lang"]) + " ('" + str(name) + "' " + str(files_Full[i][9][track]["track_type"]) + ")"
                 else:
-                    if str(track) in ids_defaults:
+                    if str(track) in files_Full[i][11]:
                         audio = audio + "<b>" + str(track) + "-" + str(files_Full[i][9][track]["track_lang"]) + " ('" + str(name) + "' " + str(files_Full[i][9][track]["track_type"]) + ")</b>"
                     else:
                         audio = audio + str(track) + "-" + str(files_Full[i][9][track]["track_lang"]) + " ('" + str(name) + "' " + str(files_Full[i][9][track]["track_type"]) + ")"
@@ -796,27 +793,28 @@ def parse_json_data():
             name = str(files_Full[i][10][track]["track_name"])
             if name == "":
                 if len(subtitles) > 0:
-                    if str(track) in ids_defaults:
-                        subtitles = subtitles + "<b>" + str(multi_lines_string) + str(track) + "-" + str(files_Full[i][10][track]["track_lang"]) + " (" + str(files_Full[i][10][track]["track_type"]) + ")</b>"
+                    if str(track) in files_Full[i][11]:
+                        subtitles = subtitles + str(multi_lines_string) + "<b>" + str(track) + "-" + str(files_Full[i][10][track]["track_lang"]) + " (" + str(files_Full[i][10][track]["track_type"]) + ")</b>"
                     else:
                         subtitles = subtitles + str(multi_lines_string) + str(track) + "-" + str(files_Full[i][10][track]["track_lang"]) + " (" + str(files_Full[i][10][track]["track_type"]) + ")"
                 else:
-                    if str(track) in ids_defaults:
+                    if str(track) in files_Full[i][11]:
                         subtitles = subtitles + "<b>" + str(track) + "-" + str(files_Full[i][10][track]["track_lang"]) + " (" + str(files_Full[i][10][track]["track_type"]) + ")</b>"
                     else:
                         subtitles = subtitles + str(track) + "-" + str(files_Full[i][10][track]["track_lang"]) + " (" + str(files_Full[i][10][track]["track_type"]) + ")"
             else:
                 if len(subtitles) > 0:
-                    if str(track) in ids_defaults:
-                        subtitles = subtitles + "<b>" + str(multi_lines_string) + str(track) + "-" + str(files_Full[i][10][track]["track_lang"]) + " ('" + str(name) + "' " + str(files_Full[i][10][track]["track_type"]) + ")</b>"
+                    if str(track) in files_Full[i][11]:
+                        subtitles = subtitles + str(multi_lines_string) + "<b>" + str(track) + "-" + str(files_Full[i][10][track]["track_lang"]) + " ('" + str(name) + "' " + str(files_Full[i][10][track]["track_type"]) + ")</b>"
                     else:
                         subtitles = subtitles + str(multi_lines_string) + str(track) + "-" + str(files_Full[i][10][track]["track_lang"]) + " ('" + str(name) + "' " + str(files_Full[i][10][track]["track_type"]) + ")"
                 else:
-                    if str(track) in ids_defaults:
+                    if str(track) in files_Full[i][11]:
                         subtitles = subtitles + "<b>" + str(track) + "-" + str(files_Full[i][10][track]["track_lang"]) + " ('" + str(name) + "' " + str(files_Full[i][10][track]["track_type"]) + ")</b>"
                     else:
                         subtitles = subtitles + str(track) + "-" + str(files_Full[i][10][track]["track_lang"]) + " ('" + str(name) + "' " + str(files_Full[i][10][track]["track_type"]) + ")"
         files_Full[i][3] = subtitles
+
 
 def update_parameter_files_at_start(command_line_parameters):  # Fix and Validate the command lind parameter files list and add to parameter_files
     global parameter_files
