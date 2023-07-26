@@ -386,14 +386,14 @@ class Main():
             # Subtitle Name
             if len(sn) > 0:
                 temp_subtitle = []
-                for track in keep_subtitle:
+                for track in files_Full[i][10]:
                     if str(sn).upper() in files_Full[i][10][track]["track_name"].upper():
                         temp_subtitle.append(track)
                 keep_subtitle = keep_subtitle + temp_subtitle
             # Subtitle Type
             if len(st) > 0:
                 temp_subtitle = []
-                for track in keep_subtitle:
+                for track in files_Full[i][10]:
                     if str(st).upper() in files_Full[i][10][track]["track_type"].upper():
                         temp_subtitle.append(track)
                 keep_subtitle = keep_subtitle + temp_subtitle
@@ -511,7 +511,7 @@ class Main():
         about = gtk.AboutDialog()
         about.connect("key-press-event", self.about_dialog_key_press)  # Easter Egg:  Check to see if Konami code has been entered
         about.set_program_name("Linux Bulk MKV Properties")
-        about.set_version("Version 1.2")
+        about.set_version("Version 1.3")
         about.set_copyright("Copyright (c) BSFEMA")
         about.set_comments("Python application using Gtk and Glade for bulk editing MKV default properties in Linux")
         about.set_license_type(gtk.License(7))  # License = MIT_X11
